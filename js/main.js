@@ -237,3 +237,14 @@ function changeServer(btn, imdbId, server) {
 
     player.src = urls[server];
 }
+
+// auto search when user types (with debounce)
+searchBox.addEventListener("input", debounce(function(e) {
+    var query = e.target.value.trim();
+    if (query.length > 2) {
+        currentSearch = query;
+        currentPage = 1;
+        movieContainer.innerHTML = "";
+        loadMovies(currentSearch);
+    }
+}, 800));
