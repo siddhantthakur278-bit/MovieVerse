@@ -205,3 +205,125 @@ body {
 .load-more-btn:hover {
     background-color: #c73651;
 }
+
+/* watch movie section */
+.watch-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #0f3460;
+}
+
+.watch-section h3 {
+    color: #e94560;
+    margin-bottom: 15px;
+}
+
+.watch-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.watch-btn {
+    padding: 8px 20px;
+    background-color: #0f3460;
+    color: white;
+    border: 1px solid #1a1a2e;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.watch-btn:hover {
+    background-color: #1a5276;
+}
+
+.watch-btn.active {
+    background-color: #e94560;
+    border-color: #e94560;
+}
+
+.player-box {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-color: black;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* trailer link */
+.trailer-link {
+    color: #ff0000;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.trailer-link:hover {
+    text-decoration: underline;
+}
+
+/* songs section */
+.songs-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #0f3460;
+}
+
+.songs-section h3 {
+    color: #e94560;
+    margin-bottom: 15px;
+}
+
+.songs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.song-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background-color: #0f3460;
+    border-radius: 8px;
+}
+
+.song-number {
+    color: #aaa;
+    font-size: 14px;
+    min-width: 20px;
+}
+
+.song-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+}
+
+.song-info {
+    flex: 1;
+}
+
+.song-name {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.song-artist {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.song-player {
+    width: 120px;
+    height: 25px;
+}
+
+/* loading text */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #aaa;
+}
