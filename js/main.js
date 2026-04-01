@@ -1,306 +1,157 @@
-// main.js - main application logic
-// MovieVerse by Siddhant
+// main.js - MovieVerse app
 
-// getting elements from html
 var searchBox = document.getElementById("searchBox");
 var searchBtn = document.getElementById("searchBtn");
 var movieContainer = document.getElementById("movieContainer");
 var sectionTitle = document.getElementById("sectionTitle");
 var loadMoreBtn = document.getElementById("loadMoreBtn");
-var movieModal = document.getElementById("movieModal");
+var modal = document.getElementById("movieModal");
 var closeBtn = document.getElementById("closeBtn");
 var modalBody = document.getElementById("modalBody");
 
-// default search term
-var currentSearch = "Avengers";
 var currentPage = 1;
-var totalResults = 0;
+var currentQuery = "";
 
-// when page loads
+// load popular movies on start
 window.onload = function() {
-    loadHomePage();
+    loadPopular();
 };
 
-// search button click
-searchBtn.addEventListener("click", function() {
-    var query = searchBox.value.trim();
-    if (query.length > 0) {
-        currentSearch = query;
-        currentPage = 1;
-        movieContainer.innerHTML = "";
-        loadHomePage();
-    }
-});
+// search
+searchBtn.onclick = function() {
+    var q = searchBox.value.trim();
+    if (q.length > 0) { currentQuery = q; currentPage = 1; movieContainer.innerHTML = ""; doSearch(q); }
+};
+searchBox.onkeyup = function(e) { if (e.key === "Enter") searchBtn.click(); };
+searchBox.addEventListener("input", debounce(function(e) {
+    var q = e.target.value.trim();
+    if (q.length > 2) { currentQuery = q; currentPage = 1; movieContainer.innerHTML = ""; doSearch(q); }
+}, 800));
 
-// enter key search
-searchBox.addEventListener("keyup", function(e) {
-    if (e.key === "Enter") {
-        searchBtn.click();
-    }
-});
-
-// load more button
-loadMoreBtn.addEventListener("click", function() {
-    currentPage++;
-    loadHomePage();
-});
+// load more
+loadMoreBtn.onclick = function() { currentPage++; doSearch(currentQuery); };
 
 // close modal
-closeBtn.addEventListener("click", function() {
-    movieModal.style.display = "none";
-    document.body.style.overflow = "auto";
-    // stop any audio playing
-    var audios = modalBody.querySelectorAll("audio");
-    for (var i = 0; i < audios.length; i++) {
-        audios[i].pause();
-    }
-});
+closeBtn.onclick = function() { modal.style.display = "none"; document.body.style.overflow = "auto"; };
+modal.onclick = function(e) { if (e.target === modal) closeBtn.click(); };
 
-// close modal when clicking outside
-movieModal.addEventListener("click", function(e) {
-    if (e.target === movieModal) {
-        closeBtn.click();
-    }
-});
-
-// function to load movies
-async function loadMovies(query) {
-    if (currentPage === 1) {
-        movieContainer.innerHTML = '<p class="loading">Loading movies...</p>';
-    }
+// search function
+async function doSearch(query) {
+    if (currentPage === 1) movieContainer.innerHTML = '<p class="loading">Loading...</p>';
     sectionTitle.textContent = 'Results for "' + query + '"';
-
     try {
         var data = await searchMovies(query, currentPage);
-        totalResults = parseInt(data.totalResults);
-
-        if (currentPage === 1) {
-            movieContainer.innerHTML = "";
-        }
-
-        displayMovies(data.Search);
-
-        // show or hide load more button
-        var loadedCount = movieContainer.querySelectorAll(".movie-card").length;
-        if (loadedCount < totalResults) {
-            loadMoreBtn.style.display = "block";
-        } else {
-            loadMoreBtn.style.display = "none";
-        }
-    } catch (error) {
-        if (currentPage === 1) {
-            movieContainer.innerHTML = "<p>No movies found. Try a different search!</p>";
-        }
+        if (currentPage === 1) movieContainer.innerHTML = "";
+        showMovies(data.Search);
+        loadMoreBtn.style.display = movieContainer.children.length < parseInt(data.totalResults) ? "block" : "none";
+    } catch (e) {
+        if (currentPage === 1) movieContainer.innerHTML = "<p>No movies found.</p>";
         loadMoreBtn.style.display = "none";
     }
 }
 
-// function to display movie cards
-function displayMovies(movies) {
-    if (!movies || movies.length === 0) return;
+// load popular movies
+async function loadPopular() {
+    movieContainer.innerHTML = '<p class="loading">Loading...</p>';
+    sectionTitle.textContent = "Popular Movies";
+    var queries = ["Avengers", "Batman", "Spider-Man", "Star Wars", "Harry Potter"];
+    var all = [];
+    for (var i = 0; i < queries.length; i++) {
+        try {
+            var data = await searchMovies(queries[i], 1);
+            if (data.Search) all = all.concat(data.Search);
+        } catch (e) {}
+    }
+    // remove duplicates
+    var seen = {};
+    var unique = [];
+    for (var j = 0; j < all.length; j++) {
+        if (!seen[all[j].imdbID]) { seen[all[j].imdbID] = true; unique.push(all[j]); }
+    }
+    unique.sort(function() { return 0.5 - Math.random(); });
+    movieContainer.innerHTML = "";
+    showMovies(unique);
+}
 
+// display movie cards
+function showMovies(movies) {
+    if (!movies) return;
     for (var i = 0; i < movies.length; i++) {
-        var movie = movies[i];
-        if (movie.Poster === "N/A") continue;
-
+        if (movies[i].Poster === "N/A") continue;
         var card = document.createElement("div");
         card.className = "movie-card";
-        card.innerHTML =
-            '<img src="' + movie.Poster + '" alt="' + movie.Title + '" class="movie-poster">' +
-            '<div class="movie-info">' +
-            '<h3 class="movie-title">' + movie.Title + '</h3>' +
-            '<p class="movie-year">' + movie.Year + ' | ' + movie.Type + '</p>' +
-            '</div>';
-
-        card.setAttribute("data-id", movie.imdbID);
-        card.addEventListener("click", function() {
-            showMovieDetails(this.getAttribute("data-id"));
-        });
-
+        card.innerHTML = '<img src="' + movies[i].Poster + '" class="movie-poster" alt="poster">' +
+            '<div class="movie-info"><h3 class="movie-title">' + movies[i].Title + '</h3>' +
+            '<p class="movie-year">' + movies[i].Year + ' | ' + movies[i].Type + '</p></div>';
+        card.setAttribute("data-id", movies[i].imdbID);
+        card.onclick = function() { openDetails(this.getAttribute("data-id")); };
         movieContainer.appendChild(card);
     }
 }
 
-// function to show movie details in modal
-async function showMovieDetails(imdbId) {
-    movieModal.style.display = "flex";
+// show movie details
+async function openDetails(id) {
+    modal.style.display = "flex";
     document.body.style.overflow = "hidden";
     modalBody.innerHTML = '<p class="loading">Loading details...</p>';
 
     try {
-        // get movie details and songs at same time
-        var movie = await getMovieDetails(imdbId);
+        var movie = await getMovieDetails(id);
         var songs = await getMovieSongs(movie.Title);
-
-        var html = "";
-
-        // movie header with poster and info
-        html += '<div class="modal-header">';
-        html += '<img src="' + (movie.Poster !== "N/A" ? movie.Poster : "") + '" class="modal-poster" alt="poster">';
-        html += '<div class="modal-info">';
-        html += '<h2>' + movie.Title + ' (' + movie.Year + ')</h2>';
-
-        if (movie.imdbRating !== "N/A") {
-            html += '<p class="rating"><i class="fa-solid fa-star"></i> ' + movie.imdbRating + '/10</p>';
-        }
-
-        html += '<p>' + formatRuntime(movie.Runtime) + ' | ' + movie.Rated + ' | ' + movie.Genre + '</p>';
-        html += '<p style="margin-top:10px">' + movie.Plot + '</p>';
-        html += '</div>';
-        html += '</div>';
-
-        // detailed info
-        html += '<div class="movie-details">';
-        html += '<div class="detail-row"><span class="detail-label">Director:</span><span>' + movie.Director + '</span></div>';
-        html += '<div class="detail-row"><span class="detail-label">Writers:</span><span>' + movie.Writer + '</span></div>';
-        html += '<div class="detail-row"><span class="detail-label">Cast:</span><span>' + movie.Actors + '</span></div>';
-        html += '<div class="detail-row"><span class="detail-label">Language:</span><span>' + movie.Language + '</span></div>';
-        html += '<div class="detail-row"><span class="detail-label">Country:</span><span>' + movie.Country + '</span></div>';
-
-        if (movie.BoxOffice && movie.BoxOffice !== "N/A") {
-            html += '<div class="detail-row"><span class="detail-label">Box Office:</span><span style="color:#4ade80;font-weight:bold">' + movie.BoxOffice + '</span></div>';
-        }
-
-        if (movie.Awards && movie.Awards !== "N/A") {
-            html += '<div class="detail-row"><span class="detail-label">Awards:</span><span style="color:#ffd700">' + movie.Awards + '</span></div>';
-        }
-
-        html += '</div>';
-
-        // watch movie section
-        html += '<div class="watch-section">';
-        html += '<h3><i class="fa-solid fa-play-circle"></i> Watch Movie</h3>';
-        html += '<div class="watch-buttons">';
-        html += '<button class="watch-btn active" onclick="changeServer(this, \'' + movie.imdbID + '\', 1)">Server 1</button>';
-        html += '<button class="watch-btn" onclick="changeServer(this, \'' + movie.imdbID + '\', 2)">Server 2</button>';
-        html += '<button class="watch-btn" onclick="changeServer(this, \'' + movie.imdbID + '\', 3)">Server 3</button>';
-        html += '</div>';
-        html += '<div class="player-box">';
-        html += '<iframe id="videoPlayer" src="https://vidsrc.xyz/embed/movie/' + movie.imdbID + '" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; fullscreen" style="width:100%;height:100%;border:none"></iframe>';
-        html += '</div>';
-        html += '</div>';
-
-        // trailer button
         var trailerUrl = "https://www.youtube.com/results?search_query=" + encodeURIComponent(movie.Title + " " + movie.Year + " trailer");
-        html += '<div style="text-align:center;margin:15px 0">';
-        html += '<a href="' + trailerUrl + '" target="_blank" class="trailer-link"><i class="fa-brands fa-youtube"></i> Watch Trailer on YouTube</a>';
-        html += '</div>';
 
-        // songs section
-        if (songs && songs.length > 0) {
-            html += '<div class="songs-section">';
-            html += '<h3><i class="fa-solid fa-music"></i> Soundtrack</h3>';
-            html += '<div class="songs-list">';
+        var html = '<div class="modal-header">' +
+            '<img src="' + movie.Poster + '" class="modal-poster">' +
+            '<div class="modal-info">' +
+            '<h2>' + movie.Title + ' (' + movie.Year + ')</h2>' +
+            (movie.imdbRating !== "N/A" ? '<p class="rating"><i class="fa-solid fa-star"></i> ' + movie.imdbRating + '/10</p>' : '') +
+            '<p>' + formatRuntime(movie.Runtime) + ' | ' + movie.Rated + ' | ' + movie.Genre + '</p>' +
+            '<p style="margin-top:8px">' + movie.Plot + '</p>' +
+            '</div></div>';
 
+        // details
+        html += '<div class="detail-row"><span class="detail-label">Director:</span>' + movie.Director + '</div>';
+        html += '<div class="detail-row"><span class="detail-label">Cast:</span>' + movie.Actors + '</div>';
+        html += '<div class="detail-row"><span class="detail-label">Writer:</span>' + movie.Writer + '</div>';
+        if (movie.BoxOffice && movie.BoxOffice !== "N/A")
+            html += '<div class="detail-row"><span class="detail-label">Box Office:</span><span style="color:#4ade80">' + movie.BoxOffice + '</span></div>';
+        if (movie.Awards && movie.Awards !== "N/A")
+            html += '<div class="detail-row"><span class="detail-label">Awards:</span><span style="color:#ffd700">' + movie.Awards + '</span></div>';
+
+        // watch section
+        html += '<div class="watch-section"><h3><i class="fa-solid fa-play-circle"></i> Watch Movie</h3>' +
+            '<div class="watch-buttons">' +
+            '<button class="watch-btn active" onclick="changeServer(this,\'' + id + '\',1)">Server 1</button>' +
+            '<button class="watch-btn" onclick="changeServer(this,\'' + id + '\',2)">Server 2</button>' +
+            '<button class="watch-btn" onclick="changeServer(this,\'' + id + '\',3)">Server 3</button></div>' +
+            '<div class="player-box"><iframe id="videoPlayer" src="https://vidsrc.xyz/embed/movie/' + id + '" frameborder="0" allowfullscreen style="width:100%;height:100%"></iframe></div></div>';
+
+        html += '<p style="text-align:center;margin:12px 0"><a href="' + trailerUrl + '" target="_blank" class="trailer-link"><i class="fa-brands fa-youtube"></i> Watch Trailer</a></p>';
+
+        // songs
+        if (songs.length > 0) {
+            html += '<div class="songs-section"><h3><i class="fa-solid fa-music"></i> Soundtrack</h3>';
             for (var i = 0; i < songs.length; i++) {
-                var song = songs[i];
-                html += '<div class="song-item">';
-                html += '<span class="song-number">' + (i + 1) + '</span>';
-                html += '<img src="' + (song.artworkUrl60 || song.artworkUrl100) + '" class="song-cover" alt="cover">';
-                html += '<div class="song-info">';
-                html += '<div class="song-name">' + song.trackName + '</div>';
-                html += '<div class="song-artist">' + song.artistName + '</div>';
-                html += '</div>';
-                if (song.previewUrl) {
-                    html += '<audio controls class="song-player"><source src="' + song.previewUrl + '" type="audio/mp4"></audio>';
-                }
-                html += '</div>';
+                html += '<div class="song-item"><img src="' + songs[i].artworkUrl60 + '" class="song-cover">' +
+                    '<div class="song-info"><div class="song-name">' + songs[i].trackName + '</div>' +
+                    '<div class="song-artist">' + songs[i].artistName + '</div></div>' +
+                    (songs[i].previewUrl ? '<audio controls class="song-player"><source src="' + songs[i].previewUrl + '" type="audio/mp4"></audio>' : '') +
+                    '</div>';
             }
-
-            html += '</div>';
             html += '</div>';
         }
 
         modalBody.innerHTML = html;
-
-    } catch (error) {
-        console.log(error);
-        modalBody.innerHTML = "<p>Could not load movie details. Please try again.</p>";
+    } catch (e) {
+        modalBody.innerHTML = "<p>Could not load details.</p>";
     }
 }
 
-// function to change video server
-function changeServer(btn, imdbId, server) {
-    // remove active class from all buttons
-    var buttons = document.querySelectorAll(".watch-btn");
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].classList.remove("active");
-    }
+// switch video server
+function changeServer(btn, id, num) {
+    var btns = document.querySelectorAll(".watch-btn");
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove("active");
     btn.classList.add("active");
-
-    var player = document.getElementById("videoPlayer");
-    var urls = {
-        1: "https://vidsrc.xyz/embed/movie/" + imdbId,
-        2: "https://vidsrc.in/embed/movie/" + imdbId,
-        3: "https://player.autoembed.cc/embed/movie/" + imdbId
-    };
-
-    player.src = urls[server];
+    var urls = { 1: "https://vidsrc.xyz/embed/movie/", 2: "https://vidsrc.in/embed/movie/", 3: "https://player.autoembed.cc/embed/movie/" };
+    document.getElementById("videoPlayer").src = urls[num] + id;
 }
-
-// auto search when user types (with debounce)
-searchBox.addEventListener("input", debounce(function(e) {
-    var query = e.target.value.trim();
-    if (query.length > 2) {
-        currentSearch = query;
-        currentPage = 1;
-        movieContainer.innerHTML = "";
-        loadHomePage();
-    }
-}, 800));
-
-// load multiple movie categories for home page
-async function loadHomePage() {
-    movieContainer.innerHTML = '<p class="loading">Loading movies...</p>';
-    sectionTitle.textContent = "Popular Movies";
-
-    var searches = ["Avengers", "Batman", "Spider-Man", "Star Wars", "Harry Potter"];
-    var allMovies = [];
-
-    try {
-        for (var i = 0; i < searches.length; i++) {
-            try {
-                var data = await searchMovies(searches[i], 1);
-                if (data.Search) {
-                    allMovies = allMovies.concat(data.Search);
-                }
-            } catch (err) {
-                console.log("Failed to load " + searches[i]);
-            }
-        }
-
-        // remove duplicates based on imdb id
-        var uniqueMovies = [];
-        var seenIds = {};
-        for (var j = 0; j < allMovies.length; j++) {
-            if (!seenIds[allMovies[j].imdbID]) {
-                seenIds[allMovies[j].imdbID] = true;
-                uniqueMovies.push(allMovies[j]);
-            }
-        }
-
-        // shuffle the array
-        uniqueMovies.sort(function() { return 0.5 - Math.random(); });
-
-        movieContainer.innerHTML = "";
-        displayMovies(uniqueMovies);
-        loadMoreBtn.style.display = "none";
-    } catch (error) {
-        movieContainer.innerHTML = "<p>Failed to load movies.</p>";
-    }
-}
-
-// scroll to top button
-var scrollTopBtn = document.getElementById("scrollTopBtn");
-
-window.addEventListener("scroll", function() {
-    if (window.scrollY > 300) {
-        scrollTopBtn.style.display = "block";
-    } else {
-        scrollTopBtn.style.display = "none";
-    }
-});
-
-scrollTopBtn.addEventListener("click", function() {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-});

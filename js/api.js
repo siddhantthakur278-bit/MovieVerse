@@ -1,68 +1,30 @@
-// api.js - handles all the api calls
-// using OMDB API for movie data
+// api.js - all api functions
+var API_KEY = "6d9ef37a";
 
-const API_KEY = "6d9ef37a";
-const BASE_URL = "https://www.omdbapi.com/";
-
-// function to search movies
+// search movies from omdb
 async function searchMovies(query, page) {
-    // default page is 1
-    if (!page) page = 1;
-
-    try {
-        let url = BASE_URL + "?s=" + encodeURIComponent(query) + "&page=" + page + "&apikey=" + API_KEY;
-        let response = await fetch(url);
-        let data = await response.json();
-
-        if (data.Response === "False") {
-            throw new Error(data.Error);
-        }
-
-        return data;
-    } catch (error) {
-        console.log("Error searching movies:", error);
-        throw error;
-    }
+    var url = "https://www.omdbapi.com/?s=" + encodeURIComponent(query) + "&page=" + (page || 1) + "&apikey=" + API_KEY;
+    var res = await fetch(url);
+    var data = await res.json();
+    if (data.Response === "False") throw new Error(data.Error);
+    return data;
 }
 
-// function to get movie details by imdb id
+// get full movie details
 async function getMovieDetails(id) {
-    try {
-        let url = BASE_URL + "?i=" + id + "&plot=full&apikey=" + API_KEY;
-        let response = await fetch(url);
-        let data = await response.json();
-
-        if (data.Response === "False") {
-            throw new Error(data.Error);
-        }
-
-        return data;
-    } catch (error) {
-        console.log("Error getting movie details:", error);
-        throw error;
-    }
+    var res = await fetch("https://www.omdbapi.com/?i=" + id + "&plot=full&apikey=" + API_KEY);
+    var data = await res.json();
+    if (data.Response === "False") throw new Error(data.Error);
+    return data;
 }
 
-// function to get songs from itunes api
-async function getMovieSongs(movieName) {
+// get songs from itunes
+async function getMovieSongs(title) {
     try {
-        let searchTerm = encodeURIComponent(movieName + " soundtrack");
-        let url = "https://itunes.apple.com/search?term=" + searchTerm + "&media=music&limit=10";
-        let response = await fetch(url);
-        let data = await response.json();
-
-        if (data.results && data.results.length > 0) {
-            return data.results;
-        }
-
-        // try without soundtrack keyword
-        let url2 = "https://itunes.apple.com/search?term=" + encodeURIComponent(movieName) + "&media=music&limit=8";
-        let response2 = await fetch(url2);
-        let data2 = await response2.json();
-        return data2.results || [];
-
-    } catch (error) {
-        console.log("Error getting songs:", error);
+        var res = await fetch("https://itunes.apple.com/search?term=" + encodeURIComponent(title + " soundtrack") + "&media=music&limit=8");
+        var data = await res.json();
+        return data.results || [];
+    } catch (e) {
         return [];
     }
 }
