@@ -248,3 +248,44 @@ searchBox.addEventListener("input", debounce(function(e) {
         loadMovies(currentSearch);
     }
 }, 800));
+
+// load multiple movie categories for home page
+async function loadHomePage() {
+    movieContainer.innerHTML = '<p class="loading">Loading movies...</p>';
+    sectionTitle.textContent = "Popular Movies";
+
+    var searches = ["Avengers", "Batman", "Spider-Man", "Star Wars", "Harry Potter"];
+    var allMovies = [];
+
+    try {
+        for (var i = 0; i < searches.length; i++) {
+            try {
+                var data = await searchMovies(searches[i], 1);
+                if (data.Search) {
+                    allMovies = allMovies.concat(data.Search);
+                }
+            } catch (err) {
+                console.log("Failed to load " + searches[i]);
+            }
+        }
+
+        // remove duplicates based on imdb id
+        var uniqueMovies = [];
+        var seenIds = {};
+        for (var j = 0; j < allMovies.length; j++) {
+            if (!seenIds[allMovies[j].imdbID]) {
+                seenIds[allMovies[j].imdbID] = true;
+                uniqueMovies.push(allMovies[j]);
+            }
+        }
+
+        // shuffle the array
+        uniqueMovies.sort(function() { return 0.5 - Math.random(); });
+
+        movieContainer.innerHTML = "";
+        displayMovies(uniqueMovies);
+        loadMoreBtn.style.display = "none";
+    } catch (error) {
+        movieContainer.innerHTML = "<p>Failed to load movies.</p>";
+    }
+}
