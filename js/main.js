@@ -11,6 +11,7 @@ var modalBody = document.getElementById("modalBody");
 
 var currentPage = 1;
 var currentQuery = "";
+var searchTimer = null; // to cancel old searches
 
 // load popular movies on start
 window.onload = function() {
@@ -25,8 +26,16 @@ searchBtn.onclick = function() {
 searchBox.onkeyup = function(e) { if (e.key === "Enter") searchBtn.click(); };
 searchBox.addEventListener("input", debounce(function(e) {
     var q = e.target.value.trim();
-    if (q.length > 2) { currentQuery = q; currentPage = 1; movieContainer.innerHTML = ""; doSearch(q); }
-}, 800));
+    if (q.length > 2) {
+        currentQuery = q;
+        currentPage = 1;
+        movieContainer.innerHTML = "";
+        doSearch(q);
+    } else if (q.length === 0) {
+        // if search box is cleared, go back to home
+        loadPopular();
+    }
+}, 600));
 
 // load more
 loadMoreBtn.onclick = function() { currentPage++; doSearch(currentQuery); };
@@ -50,11 +59,18 @@ async function doSearch(query) {
     }
 }
 
-// load popular movies
+// load popular movies (hollywood + bollywood)
 async function loadPopular() {
     movieContainer.innerHTML = '<p class="loading">Loading...</p>';
     sectionTitle.textContent = "Popular Movies";
-    var queries = ["Avengers", "Batman", "Spider-Man", "Star Wars", "Harry Potter"];
+    loadMoreBtn.style.display = "none";
+
+    // mix of hollywood and bollywood search terms
+    var queries = [
+        "Avengers", "Batman", "Spider-Man", "Inception",
+        "Dangal", "RRR", "Pathaan", "Jawan", "3 Idiots",
+        "PK", "Bahubali", "KGF", "Animal", "Fighter"
+    ];
     var all = [];
     for (var i = 0; i < queries.length; i++) {
         try {
