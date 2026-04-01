@@ -88,7 +88,15 @@ body {
 }
 .watch-btn.active { background: #e94560; }
 .player-box { width: 100%; aspect-ratio: 16/9; background: black; border-radius: 8px; overflow: hidden; }
-.trailer-link { color: #ff0000; text-decoration: none; font-weight: bold; }
+.action-buttons { display: flex; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
+.action-link {
+    text-decoration: none; font-weight: bold; font-size: 15px;
+    padding: 10px 20px; border-radius: 8px; display: flex; align-items: center; gap: 8px;
+}
+.trailer-link { color: white; background: #cc0000; }
+.trailer-link:hover { background: #aa0000; }
+.download-link { color: white; background: #0f9d58; }
+.download-link:hover { background: #0b7a45; }
 
 /* songs */
 .song-item {

@@ -142,7 +142,11 @@ async function openDetails(id) {
             '<button class="watch-btn" onclick="changeServer(this,\'' + id + '\',3)">Server 3</button></div>' +
             '<div class="player-box"><iframe id="videoPlayer" src="https://vidsrc.xyz/embed/movie/' + id + '" frameborder="0" allowfullscreen style="width:100%;height:100%"></iframe></div></div>';
 
-        html += '<p style="text-align:center;margin:12px 0"><a href="' + trailerUrl + '" target="_blank" class="trailer-link"><i class="fa-brands fa-youtube"></i> Watch Trailer</a></p>';
+        // trailer and download buttons
+        html += '<div class="action-buttons">' +
+            '<a href="' + trailerUrl + '" target="_blank" class="action-link trailer-link"><i class="fa-brands fa-youtube"></i> Watch Trailer</a>' +
+            '<a href="https://dl.vidsrc.vip/movie/' + id + '" target="_blank" class="action-link download-link"><i class="fa-solid fa-download"></i> Download Movie</a>' +
+            '</div>';
 
         // songs
         if (songs.length > 0) {
