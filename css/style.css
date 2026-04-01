@@ -406,3 +406,26 @@ body {
     background-color: #c73651;
     transform: translateY(-3px);
 }
+
+/* some extra styling */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background-color: #e94560;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background-color: #1a1a2e;
+}
+
+/* navbar logo animation */
+.logo {
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+}
