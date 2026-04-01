@@ -383,3 +383,26 @@ body {
         width: 150px;
     }
 }
+
+/* scroll to top button */
+.scroll-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    background-color: #e94560;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: none;
+    z-index: 999;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+}
+
+.scroll-top:hover {
+    background-color: #c73651;
+    transform: translateY(-3px);
+}
