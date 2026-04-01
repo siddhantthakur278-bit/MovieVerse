@@ -18,7 +18,7 @@ var totalResults = 0;
 
 // when page loads
 window.onload = function() {
-    loadMovies(currentSearch);
+    loadHomePage();
 };
 
 // search button click
@@ -28,7 +28,7 @@ searchBtn.addEventListener("click", function() {
         currentSearch = query;
         currentPage = 1;
         movieContainer.innerHTML = "";
-        loadMovies(currentSearch);
+        loadHomePage();
     }
 });
 
@@ -42,7 +42,7 @@ searchBox.addEventListener("keyup", function(e) {
 // load more button
 loadMoreBtn.addEventListener("click", function() {
     currentPage++;
-    loadMovies(currentSearch);
+    loadHomePage();
 });
 
 // close modal
@@ -245,7 +245,7 @@ searchBox.addEventListener("input", debounce(function(e) {
         currentSearch = query;
         currentPage = 1;
         movieContainer.innerHTML = "";
-        loadMovies(currentSearch);
+        loadHomePage();
     }
 }, 800));
 
