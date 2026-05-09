@@ -267,13 +267,53 @@ h1, h2, h3, .bau-heading {
 /* Mobile Vision Switcher Fix */
 @media (max-width: 480px) {
   .movie-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
   }
   
   .bau-button {
-    padding: 0.5rem 1rem !important;
-    font-size: 0.75rem !important;
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0;
+  }
+
+  .hero-section {
+    padding: 1.5rem 1rem !important;
+    margin-bottom: 2rem;
+  }
+
+  .bau-display {
+    font-size: 2.2rem !important;
+    letter-spacing: -2px;
+  }
+
+  /* Compact Navbar for Mobile */
+  nav {
+    padding: 0.75rem !important;
+  }
+
+  nav > div {
+    gap: 0.75rem !important;
+  }
+
+  /* Adjust detail page for small screens */
+  .detail-grid {
+    gap: 1.5rem !important;
+  }
+
+  .detail-grid h1 {
+    font-size: 2rem !important;
+  }
+}
+
+/* Optimization for very small devices */
+@media (max-width: 360px) {
+  .movie-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .bau-display {
+    font-size: 1.8rem !important;
   }
 }
 
