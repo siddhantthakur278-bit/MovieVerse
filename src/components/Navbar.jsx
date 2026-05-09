@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Film, Search, X } from 'lucide-react';
+import { Search, X, Circle, Square, Triangle, Heart, Clock, Bookmark, Eye, Palette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLists } from '../context/ListsContext';
 
 const Navbar = ({ searchQuery, setSearchQuery }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [localQuery, setLocalQuery] = useState(searchQuery);
+  const [showVision, setShowVision] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { vision, setVision } = useLists();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,7 +20,6 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Sync local input with global search state if navigated away
   useEffect(() => {
     if (location.pathname !== '/') {
       setLocalQuery('');
@@ -41,12 +43,21 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
     setSearchQuery('');
   };
 
+  const navLinks = [
+    { path: '/', label: 'HOME', color: 'var(--bau-red)', icon: Square },
+    { path: '/lists', label: 'COLLECTIONS', color: 'var(--bau-blue)', icon: Circle },
+  ];
+
+  const visionModes = [
+    { id: 'modernist', label: 'MODERNIST', color: 'var(--bau-yellow)' },
+    { id: 'noir', label: '1920_NOIR', color: 'var(--bau-black)' },
+    { id: 'technicolor', label: 'TECHNICOLOR', color: 'var(--bau-red)' },
+  ];
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-      className={`glass`}
       style={{
         position: 'sticky',
         top: 0,
@@ -55,96 +66,167 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        transition: 'all 0.3s ease',
-        background: isScrolled ? 'rgba(10, 10, 10, 0.85)' : 'rgba(20, 20, 20, 0.4)',
+        gap: '2rem',
+        background: 'var(--bau-white)',
+        borderBottom: 'var(--bau-border-width) solid var(--bau-black)',
+        boxShadow: isScrolled ? 'var(--bau-shadow-sm)' : 'none',
+        flexWrap: 'wrap'
       }}
     >
-      <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }} onClick={clearSearch}>
-        <motion.div
-          whileHover={{ rotate: 180 }}
-          transition={{ duration: 0.5 }}
-          style={{
-            background: 'linear-gradient(135deg, #e50914, #ff4b4b)',
-            padding: '0.5rem',
-            borderRadius: '12px',
-            display: 'flex',
-          }}
-        >
-          <Film color="white" size={24} />
-        </motion.div>
-        <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', letterSpacing: '1px' }}>
-          Movie<span style={{ color: '#e50914' }}>Verse</span>
+      <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '1rem' }} onClick={clearSearch}>
+        {/* Bauhaus Geometric Logo */}
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            style={{ width: '24px', height: '24px', background: 'var(--bau-red)', borderRadius: '50%', border: '2px solid var(--bau-black)' }}
+          />
+          <motion.div
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            style={{ width: '24px', height: '24px', background: 'var(--bau-yellow)', border: '2px solid var(--bau-black)' }}
+          />
+          <motion.div
+             animate={{ scale: [1, 1.1, 1] }}
+             transition={{ duration: 2, repeat: Infinity }}
+             style={{ 
+              width: '24px', 
+              height: '24px', 
+              background: 'var(--bau-blue)', 
+              clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+              border: '2px solid var(--bau-black)'
+            }} 
+          />
+        </div>
+        <span className="bau-heading" style={{ fontSize: '1.75rem', color: 'var(--bau-black)', letterSpacing: '-1px' }}>
+          MOVIE<span style={{ color: 'var(--bau-red)' }}>VERSE</span>
         </span>
       </Link>
 
-      <form onSubmit={handleSearch} style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
-        <input
-          type="text"
-          placeholder="Search movies, series..."
-          value={localQuery}
-          onChange={(e) => {
-            setLocalQuery(e.target.value);
-            if (e.target.value === '') {
-              setSearchQuery('');
-            }
-          }}
-          style={{
-            width: '100%',
-            padding: '0.8rem 1.2rem',
-            paddingLeft: '3rem',
-            paddingRight: '3rem',
-            borderRadius: '50px',
-            border: '1px solid rgba(255,255,255,0.1)',
-            background: 'rgba(255,255,255,0.05)',
-            color: 'white',
-            outline: 'none',
-            fontSize: '1rem',
-            transition: 'all 0.3s ease',
-          }}
-          onFocus={(e) => {
-            e.target.style.background = 'rgba(255,255,255,0.1)';
-            e.target.style.borderColor = '#e50914';
-            e.target.style.boxShadow = '0 0 15px rgba(229, 9, 20, 0.3)';
-          }}
-          onBlur={(e) => {
-            e.target.style.background = 'rgba(255,255,255,0.05)';
-            e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-            e.target.style.boxShadow = 'none';
-          }}
-        />
-        <Search
-          size={18}
-          color="#a3a3a3"
-          style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
-        />
-        <AnimatePresence>
-          {localQuery && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              type="button"
-              onClick={clearSearch}
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        {/* Navigation Links */}
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {navLinks.map(link => (
+            <Link
+              key={link.path}
+              to={link.path}
               style={{
-                position: 'absolute',
-                right: '1rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0.2rem',
+                textDecoration: 'none',
+                fontWeight: 900,
+                fontSize: '0.85rem',
+                padding: '0.6rem 1.2rem',
+                border: '2px solid var(--bau-black)',
+                background: location.pathname === link.path ? link.color : 'white',
+                color: location.pathname === link.path ? (link.color === 'var(--bau-yellow)' ? 'black' : 'white') : 'black',
+                boxShadow: location.pathname === link.path ? 'none' : '4px 4px 0px black',
+                transform: location.pathname === link.path ? 'translate(2px, 2px)' : 'none',
+                transition: 'all 0.1s ease'
               }}
             >
-              <X size={18} color="#a3a3a3" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </form>
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Vision Switcher */}
+        <div style={{ position: 'relative' }}>
+          <button 
+            onClick={() => setShowVision(!showVision)}
+            className="bau-button"
+            style={{ 
+              padding: '0.6rem', 
+              background: 'white', 
+              boxShadow: '4px 4px 0px black',
+              transform: showVision ? 'translate(2px, 2px)' : 'none'
+            }}
+            title="CINEMATIC_VISION"
+          >
+            <Eye size={20} />
+          </button>
+          
+          <AnimatePresence>
+            {showVision && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                style={{
+                  position: 'absolute',
+                  top: '120%',
+                  right: 0,
+                  background: 'var(--bau-white)',
+                  border: '2px solid black',
+                  boxShadow: '8px 8px 0px black',
+                  padding: '0.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem',
+                  width: '200px',
+                  zIndex: 1000
+                }}
+              >
+                {visionModes.map(mode => (
+                  <button
+                    key={mode.id}
+                    onClick={() => {
+                      setVision(mode.id);
+                      setShowVision(false);
+                    }}
+                    style={{
+                      padding: '0.6rem',
+                      textAlign: 'left',
+                      background: vision === mode.id ? mode.color : 'white',
+                      color: vision === mode.id ? (mode.id === 'noir' || mode.id === 'technicolor' ? 'white' : 'black') : 'black',
+                      fontWeight: 900,
+                      border: '2px solid black',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem'
+                    }}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <form onSubmit={handleSearch} style={{ position: 'relative', width: '250px' }}>
+          <input
+            type="text"
+            placeholder="SEARCH_CONTENT..."
+            value={localQuery}
+            onChange={(e) => {
+              setLocalQuery(e.target.value);
+              if (e.target.value === '') {
+                setSearchQuery('');
+              }
+            }}
+            className="bau-border-sm"
+            style={{
+              width: '100%',
+              padding: '0.6rem 1rem',
+              paddingLeft: '2.5rem',
+              background: 'var(--bau-white)',
+              color: 'var(--bau-black)',
+              outline: 'none',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              boxShadow: '4px 4px 0px black',
+            }}
+          />
+          <Search
+            size={16}
+            color="var(--bau-black)"
+            style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)' }}
+          />
+        </form>
+      </div>
     </motion.nav>
   );
 };
 
 export default Navbar;
+
+

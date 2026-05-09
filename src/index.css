@@ -1,14 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap');
 
 :root {
-  --bg-dark: #0a0a0a;
-  --bg-card: #141414;
-  --primary: #e50914;
-  --primary-hover: #f40612;
-  --text-main: #ffffff;
-  --text-muted: #a3a3a3;
-  --glass-bg: rgba(20, 20, 20, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  /* Bauhaus Palette */
+  --bau-bg: #F0F0F0;
+  --bau-black: #121212;
+  --bau-white: #FFFFFF;
+  --bau-red: #D02020;
+  --bau-blue: #1040C0;
+  --bau-yellow: #F0C020;
+  --bau-muted: #E0E0E0;
+  
+  /* Borders */
+  --bau-border-width: 4px;
+  --bau-border-width-sm: 2px;
+  
+  /* Shadows */
+  --bau-shadow-sm: 4px 4px 0px 0px var(--bau-black);
+  --bau-shadow-md: 6px 6px 0px 0px var(--bau-black);
+  --bau-shadow-lg: 8px 8px 0px 0px var(--bau-black);
+}
+
+/* Vision Modes */
+body.vision-noir {
+  filter: grayscale(100%) contrast(1.2);
+  --bau-bg: #EAEAEA;
+  --bau-red: #444444;
+  --bau-blue: #222222;
+  --bau-yellow: #999999;
+}
+
+body.vision-technicolor {
+  filter: saturate(1.8) contrast(1.1);
+  --bau-bg: #FFF9F0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.05;
+}
+
+body.vision-noir::after {
+  background-image: url('https://www.transparenttextures.com/patterns/film-grain.png');
+  opacity: 0.15;
 }
 
 * {
@@ -19,22 +59,26 @@
 
 body {
   font-family: 'Outfit', sans-serif;
-  background-color: var(--bg-dark);
-  color: var(--text-main);
+  background-color: var(--bau-bg);
+  color: var(--bau-black);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  /* Dot grid pattern */
+  background-image: radial-gradient(var(--bau-muted) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Bauhaus Style */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-dark);
+  background: var(--bau-bg);
+  border-left: var(--bau-border-width-sm) solid var(--bau-black);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 4px;
+  background: var(--bau-red);
+  border: var(--bau-border-width-sm) solid var(--bau-black);
 }
 
 .app-container {
@@ -43,12 +87,80 @@ body {
   flex-direction: column;
 }
 
-/* Glassmorphism utilities */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
+/* Bauhaus Utilities */
+.bau-border {
+  border: var(--bau-border-width) solid var(--bau-black);
+}
+
+.bau-border-sm {
+  border: var(--bau-border-width-sm) solid var(--bau-black);
+}
+
+.bau-shadow {
+  shadow: var(--bau-shadow-md);
+}
+
+.bau-card {
+  background: var(--bau-white);
+  border: var(--bau-border-width) solid var(--bau-black);
+  box-shadow: var(--bau-shadow-lg);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.bau-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0px 0px var(--bau-black);
+}
+
+.bau-button {
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: var(--bau-border-width-sm) solid var(--bau-black);
+  box-shadow: var(--bau-shadow-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease-out;
+}
+
+.bau-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.bau-button-primary {
+  background-color: var(--bau-red);
+  color: var(--bau-white);
+}
+
+.bau-button-secondary {
+  background-color: var(--bau-blue);
+  color: var(--bau-white);
+}
+
+.bau-button-yellow {
+  background-color: var(--bau-yellow);
+  color: var(--bau-black);
+}
+
+/* Typography */
+h1, h2, h3, .bau-heading {
+  text-transform: uppercase;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+
+.bau-display {
+  font-size: clamp(3rem, 10vw, 6rem);
+}
+
+.bau-subheading {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 700;
 }
 
 /* Loader */
@@ -58,27 +170,110 @@ body {
   align-items: center;
   padding: 4rem;
 }
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(229, 9, 20, 0.3);
-  border-radius: 50%;
-  border-top-color: var(--primary);
-  animation: spin 1s ease-in-out infinite;
+
+.bau-spinner {
+  width: 60px;
+  height: 60px;
+  background: var(--bau-yellow);
+  border: var(--bau-border-width) solid var(--bau-black);
+  animation: bau-spin 1.5s steps(4) infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* Base Layout Classes */
+.hero-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
+  border: var(--bau-border-width) solid var(--bau-black);
+  background: var(--bau-white);
+  box-shadow: var(--bau-shadow-lg);
+  overflow: hidden;
 }
 
-/* Inputs */
-input {
-  font-family: inherit;
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 3rem;
 }
 
-/* Utilities */
-.text-gradient {
-  background: linear-gradient(90deg, #fff, #a3a3a3);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Global Grid Layouts */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2.5rem;
 }
+
+/* Responsive Overrides */
+@media (max-width: 1100px) {
+  .hero-section {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+}
+
+@media (max-width: 968px) {
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .bau-display {
+    font-size: 3.5rem !important;
+  }
+  
+  .hero-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-composition {
+    height: 300px;
+    border-left: none !important;
+    border-top: var(--bau-border-width) solid var(--bau-black);
+  }
+}
+
+@media (max-width: 640px) {
+  .bau-display {
+    font-size: 2.5rem !important;
+  }
+  
+  nav {
+    padding: 1rem !important;
+  }
+  
+  nav > div {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+  
+  nav form {
+    width: 100% !important;
+  }
+  
+  .bau-heading {
+    font-size: 1.5rem !important;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .hero-section {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Mobile Vision Switcher Fix */
+@media (max-width: 480px) {
+  .movie-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .bau-button {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
