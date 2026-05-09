@@ -7,7 +7,20 @@ import { useLists } from '../context/ListsContext';
 const MovieCard = ({ movie, index }) => {
   const { toggleList, isInList } = useLists();
   const [isHovered, setIsHovered] = useState(false);
-  
+  const [canHover, setCanHover] = useState(false);
+
+  useEffect(() => {
+    setCanHover(window.matchMedia('(hover: hover)').matches);
+  }, []);
+
+  const handleMouseEnter = () => {
+    if (canHover) setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (canHover) setIsHovered(false);
+  };
+
   const shapes = ['circle', 'square', 'triangle'];
   const shape = shapes[index % 3];
   const colors = ['var(--bau-red)', 'var(--bau-blue)', 'var(--bau-yellow)'];
@@ -25,8 +38,8 @@ const MovieCard = ({ movie, index }) => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, delay: index * 0.03 }}
       style={{ display: 'flex' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="bau-card" style={{
         display: 'flex',

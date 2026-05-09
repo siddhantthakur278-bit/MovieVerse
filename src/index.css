@@ -105,11 +105,14 @@ body {
   border: var(--bau-border-width) solid var(--bau-black);
   box-shadow: var(--bau-shadow-lg);
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  width: 100%;
 }
 
-.bau-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 10px 10px 0px 0px var(--bau-black);
+@media (hover: hover) {
+  .bau-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 10px 10px 0px 0px var(--bau-black);
+  }
 }
 
 .bau-button {
@@ -124,6 +127,13 @@ body {
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s ease-out;
+}
+
+@media (hover: hover) {
+  .bau-button:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 0px 0px var(--bau-black);
+  }
 }
 
 .bau-button:active {
